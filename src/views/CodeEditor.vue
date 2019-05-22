@@ -17,7 +17,7 @@
                 </div>
             </v-responsive>
             <v-card-actions>
-                <v-btn dark large round class="blue">Test Code</v-btn>
+                <v-btn dark large round class="blue" @click="testCode">Test Code</v-btn>
                 <v-spacer></v-spacer>
                 <v-btn outline class="blue">Reset Code</v-btn>
                 <v-btn outline class="blue">Dashboard</v-btn>
@@ -115,6 +115,11 @@ export default {
                     this.challenge = doc.data();
                 }
             });
+    },
+    methods: {
+        testCode() {
+            // code to test user's code goes below
+        }
     }
 };
 </script>
