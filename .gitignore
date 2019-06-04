@@ -2,6 +2,7 @@
 node_modules
 /dist
 
+public/js/workers
 # local env files
 .env.local
 .env.*.local
