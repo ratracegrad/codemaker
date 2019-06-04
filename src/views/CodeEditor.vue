@@ -1,34 +1,37 @@
 <template>
-    <v-container>
-        <v-card>
-            <v-card-title>
-                <div class="title text-capitalize">{{ challenge.name }}</div>
-            </v-card-title>
-            <v-card-text class="subheading">
-                <div v-html="challenge.instructions"></div>
-            </v-card-text>
-            <v-responsive>
-                <div class="codemirror">
-                    <codemirror
-                        v-if="challenge.hasOwnProperty('name')"
-                        v-model="challenge.code"
-                        :options="cmOption"
-                    ></codemirror>
-                </div>
-            </v-responsive>
-            <v-card-actions>
-                <v-btn dark large round class="blue" @click="testCode">Test Code</v-btn>
-                <v-spacer></v-spacer>
-                <v-btn outline class="blue">Reset Code</v-btn>
-                <v-btn outline class="blue">Dashboard</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-container>
+  <v-container>
+    <v-card>
+      <v-card-title>
+        <div class="title text-capitalize">{{ challenge.name }}</div>
+      </v-card-title>
+      <v-card-text class="subheading">
+        <div v-html="challenge.instructions"></div>
+      </v-card-text>
+      <v-responsive>
+        <div class="codemirror">
+          <codemirror
+            @ready="handleCMReady"
+            v-if="challenge.hasOwnProperty('name')"
+            v-model="challenge.code"
+            :options="cmOption"
+          ></codemirror>
+        </div>
+      </v-responsive>
+      <v-card-actions>
+        <v-btn dark large round class="blue" @click="testCode">Test Code</v-btn>
+        <v-spacer></v-spacer>
+        <v-btn outline class="blue">Reset Code</v-btn>
+        <v-btn outline class="blue">Dashboard</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import db from '@/plugins/firebase';
+
+import testRunner from '../module/test-runner';
 // language
 import 'codemirror/mode/javascript/javascript.js';
 
@@ -99,7 +102,8 @@ export default {
             showCursorWhenSelecting: true,
             theme: 'monokai',
             extraKeys: { Ctrl: 'autocomplete' }
-        }
+        },
+        editor: null
     }),
     computed: {
         ...mapState({
@@ -117,8 +121,18 @@ export default {
             });
     },
     methods: {
+        handleCMReady(editor) {
+            this.editor = editor;
+        },
         testCode() {
-            // code to test user's code goes below
+            if (!this.editor) {
+                return;
+            }
+            const userCode = this.editor.getValue();
+            const { tests } = this.challenge;
+            return testRunner(userCode, ["expect(typeof palindrome).to.equal('function')"]).then(result =>
+                console.log(result)
+            );
         }
     }
 };
